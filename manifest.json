@@ -1,0 +1,16 @@
+{
+    "name": "Touch_Examples",
+    "short_name": "Touch_Examples",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "theme_color": "#3c346d",
+    "background_color": "#3c346d",
+    "icons": [
+        {
+            "src": "/icon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

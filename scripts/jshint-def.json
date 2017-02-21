@@ -1,0 +1,37 @@
+{
+    "checkPath": [
+        "src/javascript",
+        "spec/javascript"
+    ],
+    "ignore": [],
+    "comments-to-ignore": [
+        "The content of this file must be a valid JSON blob, so comments are",
+        "not permitted. This is a work around.",
+        "",
+        "You can have 'indent' or 'white', not both, on JSHint as old as ours."
+    ],
+    "lintOptions": {
+        "bitwise": true,
+        "browser" : true,
+        "curly": true,
+        "devel": true,
+        "eqeqeq": true,
+        "forin": true,
+        "immed": true,
+        "jquery": true,
+        "latedef": true,
+        "newcap": true,
+        "noarg": true,
+        "noempty": true,
+        "nonew": true,
+        "strict": true,
+        "trailing": true,
+        "undef": true,
+        "white": false,
+        "expr": true
+    },
+    "globals": {
+        "require": false,
+        "define": false
+    }
+}

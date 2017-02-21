@@ -1,0 +1,57 @@
+.slider {
+    box-sizing: border-box;
+    max-width: 640px; /* hacky, based on images, for large screen demos */
+    overflow: hidden;
+
+    &:not(&--loaded) {
+        overflow-x: scroll;
+
+        .slider__container {
+            margin: 0;
+        }
+    }
+
+    @at-root #{&}__heading {
+        font-size: 1.2em;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+    }
+
+    @at-root #{&}__container {
+        width: 90%;
+        margin: 0 auto;
+    }
+
+    @at-root #{&}__viewport {
+        position: relative;
+        transition: all 0s cubic-bezier(0, 0, 1, 1);
+        white-space: nowrap;
+        margin: 0;
+        padding: 0;
+
+        // spcing between inline-block elements
+        font-size: 0;
+    }
+
+    @at-root #{&}__slide {
+        display: inline-block;
+        height: 100%;
+        vertical-align: top;
+        width: 100%;
+        white-space: nowrap;
+        margin: 0;
+        padding: 0;
+
+        // offsetWidth does not include margin
+        padding-left: 2.5px;
+        padding-right: 2.5px;
+    }
+
+    @at-root #{&}__image {
+        min-width: 50%;
+        max-width: 100%;
+        white-space: nowrap;
+        margin: 0;
+        padding: 0;
+    }
+}

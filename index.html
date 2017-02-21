@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Touch Examples</title>
+
+        <!-- Mobile Specific Metas -->
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="dist/assets/css/main.min.css">
+
+        <script type="text/javascript">htmlStartTime = Date.now();</script>
+    </head>
+    <body>
+        <div class="js-slider slider" data-name="pictureSlider">
+            <h1 class="slider__heading">Picture Slider</h1>
+            <div class="slider__container">
+                <ul class="js-slider-viewport slider__viewport">
+                    <li class="js-slider-slide slider__slide"><img class="slider__image" src="dist/assets/img/slide-1.jpg"></li>
+                    <li class="js-slider-slide slider__slide"><img class="slider__image" src="dist/assets/img/slide-2.jpg"></li>
+                    <li class="js-slider-slide slider__slide"><img class="slider__image" src="dist/assets/img/slide-3.jpg"></li>
+                    <li class="js-slider-slide slider__slide"><img class="slider__image" src="dist/assets/img/slide-4.jpg"></li>
+                </ul>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            (function() {
+                // Load time
+                loadTime = Date.now();
+            }())
+
+            window.addEventListener('load', function() {
+                // Window Load time
+                windowLoadTime = Date.now();
+            });
+
+            document.onreadystatechange = function() {
+                if (document.readyState === 'interactive') {
+                    // Interactive DOM time
+                    interactiveDOMTime = Date.now();
+                } else if (document.readyState === 'complete') {
+                    // Complete DOM time
+                    completeDOMTime = Date.now();
+                }
+            }
+        </script>
+        <script type="text/javascript">applicationStartTime=Date.now();</script>
+        <script src="dist/lib/deps.min.js"></script>
+        <script src="dist/assets/js/main.min.js"></script>
+        <script type="text/javascript">jsStartTime=Date.now();</script>
+    </body>
+</html>
