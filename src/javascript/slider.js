@@ -227,7 +227,7 @@ define('slider', [
 
             this.offsetX = (this.deltaX / this.resistance) + this._getScroll();
 
-            event.preventDefault();
+            // event.preventDefault();
 
             this.resistance = this.slideNumber === 0 && this.deltaX > 0 ? (this.pageX / this.sliderWidth) + 1.25 : this.slideNumber === this.lastSlide && this.deltaX < 0 ? (Math.abs(this.pageX) / this.sliderWidth) + 1.25 : 1;
 
