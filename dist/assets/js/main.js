@@ -51,6 +51,8 @@ define('main', [
             });
             console.log(pictureSlider);
 
+            document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+
             window.addEventListener('slide:pictureSlider', function(event) {
                 console.log('Slider Picture');
                 console.log(event);
@@ -167,9 +169,6 @@ define('slider', [
             this.$slider.addEventListener('touchstart', this._onTouchStart.bind(this), false);
             this.$slider.addEventListener('touchmove', this._onTouchMove.bind(this), false);
             this.$slider.addEventListener('touchend', this._onTouchEnd.bind(this), false);
-
-            this.$slider.onselectstart = falseFn;
-            this.$slider.ondragstart = falseFn;
 
             this.$slider.addEventListener('webkitTransitionEnd', this._onScrollTransformEnd.bind(this), false);
             this.$slider.addEventListener('oTransitionEnd', this._onScrollTransformEnd.bind(this), false);
@@ -295,7 +294,6 @@ define('slider', [
 
             // started moving
             this.startedMoving = true;
-
 
             var parsedEvent = this._parseEvent(event);
 
