@@ -104,16 +104,19 @@ define('slider', [
         },
 
         bindEvents: function() {
-            this.$slider.addEventListener('touchstart', this._onTouchStart.bind(this));
-            this.$slider.addEventListener('touchmove', this._onTouchMove.bind(this));
-            this.$slider.addEventListener('touchend', this._onTouchEnd.bind(this));
+            this.$slider.addEventListener('touchstart', this._onTouchStart.bind(this), false);
+            this.$slider.addEventListener('touchmove', this._onTouchMove.bind(this), false);
+            this.$slider.addEventListener('touchend', this._onTouchEnd.bind(this), false);
 
-            this.$slider.addEventListener('webkitTransitionEnd', this._onScrollTransformEnd.bind(this));
-            this.$slider.addEventListener('oTransitionEnd', this._onScrollTransformEnd.bind(this));
-            this.$slider.addEventListener('transitionend', this._onScrollTransformEnd.bind(this));
-            this.$slider.addEventListener('transitionEnd', this._onScrollTransformEnd.bind(this));
+            this.$slider.onselectstart = falseFn;
+            this.$slider.ondragstart = falseFn;
 
-            window.addEventListener('resize', this._reSizePages);
+            this.$slider.addEventListener('webkitTransitionEnd', this._onScrollTransformEnd.bind(this), false);
+            this.$slider.addEventListener('oTransitionEnd', this._onScrollTransformEnd.bind(this), false);
+            this.$slider.addEventListener('transitionend', this._onScrollTransformEnd.bind(this), false);
+            this.$slider.addEventListener('transitionEnd', this._onScrollTransformEnd.bind(this), false);
+
+            window.addEventListener('resize', this._reSizePages, false);
         },
 
         destroy: function() {
@@ -336,6 +339,10 @@ define('slider', [
     }
 
     function noop() {}
+
+    function falseFn() {
+        return false;
+    }
 
     function setStyles(element, styles) {
 
