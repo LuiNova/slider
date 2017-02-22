@@ -108,9 +108,6 @@ define('slider', [
             this.$slider.addEventListener('touchmove', this._onTouchMove.bind(this), false);
             this.$slider.addEventListener('touchend', this._onTouchEnd.bind(this), false);
 
-            this.$slider.onselectstart = falseFn;
-            this.$slider.ondragstart = falseFn;
-
             this.$slider.addEventListener('webkitTransitionEnd', this._onScrollTransformEnd.bind(this), false);
             this.$slider.addEventListener('oTransitionEnd', this._onScrollTransformEnd.bind(this), false);
             this.$slider.addEventListener('transitionend', this._onScrollTransformEnd.bind(this), false);
@@ -227,7 +224,7 @@ define('slider', [
 
             this.offsetX = (this.deltaX / this.resistance) + this._getScroll();
 
-            // event.preventDefault();
+            event.preventDefault();
 
             this.resistance = this.slideNumber === 0 && this.deltaX > 0 ? (this.pageX / this.sliderWidth) + 1.25 : this.slideNumber === this.lastSlide && this.deltaX < 0 ? (Math.abs(this.pageX) / this.sliderWidth) + 1.25 : 1;
 
@@ -235,7 +232,6 @@ define('slider', [
 
             // started moving
             this.startedMoving = true;
-
 
             var parsedEvent = this._parseEvent(event);
 

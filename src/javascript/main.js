@@ -34,6 +34,8 @@ define('main', [
             });
             console.log(pictureSlider);
 
+            document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+
             window.addEventListener('slide:pictureSlider', function(event) {
                 console.log('Slider Picture');
                 console.log(event);
