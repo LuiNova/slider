@@ -6,14 +6,47 @@ define('slider', [
     'use strict';
 
     var transformPrefix   = '',
-        transformProperty = 'transform';
+        transformProperty = 'transform',
+        defaultSettings = {
+            onSwipeEnd: noop,
+            onDragStart: noop,
+            onDrag: noop,
+            onDragEnd: noop
+        },
+        supports = (function() {
+            var div = document.createElement('div'),
+                vendors = 'Khtml Ms O Moz Webkit'.split(' '),
+                len = vendors.length;
+
+            return function(prop) {
+                if (prop in div.style) {
+                    return true;
+                }
+
+                prop = prop.replace(/^[a-z]/, function(val) {
+                    return val.toUpperCase();
+                });
+
+                while(len--) {
+                    if ((vendors[len] + prop) in div.style) {
+                        return true;
+                    }
+                }
+
+                return false;
+            };
+        }()),
+        supportTransform = supports('transform');
 
     /**
      * Helpful events to trigger: scroll, beforeScroll, scrollEnd
      * helpful info to send: x/y position, direciton, currentPage
      */
     var Slider = {
-        init: function($element) {
+        init: function($element, settings) {
+            var defaultSettingsCopy = extend({}, defaultSettings);
+
+            this.settings = extend(defaultSettingsCopy, settings);
 
             this.cacheElements($element);
 
@@ -25,6 +58,7 @@ define('slider', [
 
             // make items loop before caching elements
 
+            this.startPage = 2;
             this.goToPage(2, 0);
 
             return this;
@@ -37,6 +71,8 @@ define('slider', [
 
         cacheValues: function() {
             this.name = this.$rootElement.dataset.name;
+
+            this.isTouch = 'ontouchstart' in window;
 
             var firstItem = this.$slider.querySelector('.js-slider-slide');
             this.scrollableArea = firstItem.offsetWidth * this.$slider.children.length;
@@ -68,44 +104,115 @@ define('slider', [
         },
 
         bindEvents: function() {
-            this.$slider.addEventListener('touchstart', this.onTouchStart.bind(this));
-            this.$slider.addEventListener('touchmove', this.onTouchMove.bind(this));
-            this.$slider.addEventListener('touchend', this.onTouchEnd.bind(this));
+            this.$slider.addEventListener('touchstart', this._onTouchStart.bind(this));
+            this.$slider.addEventListener('touchmove', this._onTouchMove.bind(this));
+            this.$slider.addEventListener('touchend', this._onTouchEnd.bind(this));
+
+            this.$slider.addEventListener('webkitTransitionEnd', this._onScrollTransformEnd.bind(this));
+            this.$slider.addEventListener('oTransitionEnd', this._onScrollTransformEnd.bind(this));
+            this.$slider.addEventListener('transitionend', this._onScrollTransformEnd.bind(this));
+            this.$slider.addEventListener('transitionEnd', this._onScrollTransformEnd.bind(this));
+
+            window.addEventListener('resize', this._reSizePages);
         },
 
-        onTouchStart: function(event) {
+        destroy: function() {
+            this.$slider.removeEventListener('touchstart', this._onTouchStart.bind(this));
+            this.$slider.removeEventListener('touchmove', this._onTouchMove.bind(this));
+            this.$slider.removeEventListener('touchend', this._onTouchEnd.bind(this));
+
+            window.removeEventListener('resize', this._reSizePages);
+        },
+
+        _onScrollTransformEnd: function(event) {
+            this._onSwipeEnd(event);
+
+            this.$slider.removeEventListener('webkitTransitionEnd', this._onScrollTransformEnd.bind(this));
+            this.$slider.removeEventListener('oTransitionEnd', this._onScrollTransformEnd.bind(this));
+            this.$slider.removeEventListener('transitionend', this._onScrollTransformEnd.bind(this));
+            this.$slider.removeEventListener('transitionEnd', this._onScrollTransformEnd.bind(this));
+        },
+
+        /**
+         * Returns an object containing the co-ordinates for the event.
+         *
+         * @param {Object} event
+         * @returns {Object}
+         */
+        _getCoords: function(event) {
+            // touch move and touch end have different touch data
+            var touches = event.touches,
+                data = touches && touches.length ? touches : event.changedTouches;
+
+            return {
+                pageX: data[0].pageX,
+                pageY: data[0].pageY
+            };
+        },
+
+        _parseEvent: function(event) {
+            var coords = this._getCoords(event),
+                x = this.startCoords.pageX - coords.pageX,
+                y = this.startCoords.pageY - coords.pageY;
+
+            return this._addDistanceValues(x, y);
+        },
+
+        _addDistanceValues: function(x, y) {
+            var eventData = {
+                distanceX: 0,
+                distanceY: 0
+            };
+
+            eventData.distanceX = x;
+            eventData.direction = x > 0 ? 'left' : 'right';
+
+            return eventData;
+        },
+
+        _reSizePages: function() {
+            console.log('Rezising');
+        },
+
+        _onTouchStart: function(event) {
             if (!this.$slider) {
                 return;
             }
+
+            this.startCoords = this._getCoords(event);
 
             this.isScrolling = undefined;
             this.resistance = 1;
             this.lastSlide = -(this.$slider.children.length - 1);
             this.startTime = +new Date();
-            this.pageX = event.touches[0].pageX;
-            this.pageY = event.touches[0].pageY;
+            this.pageX = this.startCoords.pageX;//event.touches[0].pageX;
+            this.pageY = this.startCoords.pageY;//event.touches[0].pageY;
             this.deltaX = 0;
             this.deltaY = 0;
 
             this._setSlideNumber(0);
 
             this.$slider.style[transformPrefix + 'transition-duration'] = 0;
+
+            this.settings.onDragStart.call(this, event);
         },
 
-        onTouchMove: function(event) {
+        _onTouchMove: function(event) {
             if (event.touches.length > 1 || !this.$slider) {
                 return; // Exit if a pinch || no slider
             }
 
+            var coords = this._getCoords(event);
+
             // adjust the starting position if we just started to avoid jumpage
             if (!this.startedMoving) {
-                this.pageX += (event.touches[0].pageX - this.pageX) - 1;
+                this.pageX += (coords.pageX - this.pageX) - 1;
             }
 
-            this.deltaX = event.touches[0].pageX - this.pageX;
-            this.deltaY = event.touches[0].pageY - this.pageY;
-            this.pageX  = event.touches[0].pageX;
-            this.pageY  = event.touches[0].pageY;
+            this.deltaX = coords.pageX - this.pageX;
+            this.deltaY = coords.pageY - this.pageY;
+            this.pageX  = coords.pageX;
+            this.pageY  = coords.pageY;
 
             if (typeof this.isScrolling === 'undefined' && this.startedMoving) {
                 this.isScrolling = Math.abs(this.deltaY) > Math.abs(this.deltaX);
@@ -125,9 +232,14 @@ define('slider', [
 
             // started moving
             this.startedMoving = true;
+
+
+            var parsedEvent = this._parseEvent(event);
+
+            this.settings.onDrag.call(this, event, parsedEvent);
         },
 
-        onTouchEnd: function(event) {
+        _onTouchEnd: function(event) {
             if (!this.$slider || this.isScrolling) {
                 return;
             }
@@ -143,6 +255,12 @@ define('slider', [
             this.$slider.style[transformProperty] = 'translate3d(' + this.offsetX + 'px,0,0)';
 
             this._dispatchEvent();
+
+            this.settings.onDragEnd.call(this, event);
+        },
+
+        _onSwipeEnd: function(event) {
+            this.settings.onSwipeEnd.call(this, event);
         },
 
         _dispatchEvent: function() {
@@ -207,8 +325,47 @@ define('slider', [
         }
     };
 
+    function extend(destination, source) {
+        var property;
+
+        for (property in source) {
+            destination[property] = source[property];
+        }
+
+        return destination;
+    }
+
+    function noop() {}
+
+    function setStyles(element, styles) {
+
+        var property,
+            value;
+
+        for (property in styles) {
+            if (styles.hasOwnProperty(property)) {
+                value = styles[property];
+
+                switch (value) {
+                    case 'height':
+                    case 'width':
+                    case 'marginLeft':
+                    case 'marginTop':
+                        value += "px";
+                        break;
+                    default:
+                        value = value;
+                }
+
+                element.style[property] = value;
+            }
+        }
+
+        return element;
+    }
+
     return {
-        createComponent: function($element) {
+        createComponent: function($element, settings) {
             if (!$element) {
                 console.log('Element does not exists in DOM');
                 return;
@@ -218,7 +375,7 @@ define('slider', [
 
             var slider = Object.create(Slider);
 
-            return slider.init($element);
+            return slider.init($element, settings);
         }
     };
 });
