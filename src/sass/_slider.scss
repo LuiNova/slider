@@ -3,6 +3,10 @@
     max-width: 640px; /* hacky, based on images, for large screen demos */
     overflow: hidden;
 
+    // margin on Body
+    // margin-left: -8px;
+    // margin-right: -8px;
+
     &:not(&--loaded) {
         overflow-x: scroll;
 

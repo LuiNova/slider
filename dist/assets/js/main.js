@@ -25,7 +25,8 @@ define('main', [
     return {
         init: function() {
             var slider = document.querySelector('.js-slider');
-            Slider.createComponent(slider);
+            var pictureSlider = Slider.createComponent(slider);
+            console.log(pictureSlider);
 
             window.addEventListener('slide:pictureSlider', function(event) {
                 console.log('Slider Picture');
@@ -46,26 +47,61 @@ define('slider', [
 
     /**
      * Helpful events to trigger: scroll, beforeScroll, scrollEnd
+     * helpful info to send: x/y position, direciton, currentPage
      */
     var Slider = {
         init: function($element) {
+
             this.cacheElements($element);
+
+            this.loopItems($element);
+
+            this.cacheValues();
+
             this.bindEvents();
 
             // make items loop before caching elements
 
             this.goToPage(2, 0);
+
+            return this;
         },
 
         cacheElements: function($element) {
             this.$rootElement = $element;
-            this.name = this.$rootElement.dataset.name;
             this.$slider = this.$rootElement.querySelector('.js-slider-viewport');
+        },
+
+        cacheValues: function() {
+            this.name = this.$rootElement.dataset.name;
 
             var firstItem = this.$slider.querySelector('.js-slider-slide');
             this.scrollableArea = firstItem.offsetWidth * this.$slider.children.length;
 
             this.sliderWidth = this.$slider.offsetWidth;
+        },
+
+        loopItems: function($element) {
+            var items = this.$slider.querySelectorAll('.js-slider-slide'),
+                itemsLength = items.length;
+
+            if (itemsLength >= 2 && itemsLength < 5) {
+                var i,
+                    itemsToCreateLoop = itemsLength === 2 ? 2 : (itemsLength - 2);
+
+                // add last two elements to the front of array - need to be cloned
+                this.$slider.insertBefore(items[itemsLength - 2].cloneNode(true), items[0]);
+                this.$slider.insertBefore(items[itemsLength - 1].cloneNode(true), items[0]);
+
+                for (i = 0; i < itemsToCreateLoop; i++) {
+                    this.$slider.appendChild(items[i].cloneNode(true));
+                }
+
+            } else if (itemsLength >= 5) {
+                // 5 or more items we just need to move the last 2 to the front - not cloned
+                this.$slider.insertBefore(items[itemsLength - 2], items[0]);
+                this.$slider.insertBefore(items[itemsLength - 1], items[0]);
+            }
         },
 
         bindEvents: function() {
