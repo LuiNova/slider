@@ -3,4 +3,4 @@ Touch Components
 
 A collection of touch/pointer demos
 
-Live versions at: https://luinova.github.io/touch/
+Live versions at: https://luinova.github.io/slider/
