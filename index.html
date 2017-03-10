@@ -26,6 +26,8 @@
             </div>
         </div>
 
+        <h1 id="sms-test">Text a friend</h1>
+
         <script type="text/javascript">
             (function() {
                 // Load time
@@ -47,6 +49,13 @@
                 }
             }
         </script>
+
+        <script type="text/javascript">
+            document.querySelector('#sms-test').addEventListener('click', function(event) {
+                document.location.href = 'sms:&body=' + encodeURIComponent('Test SMS in iOS');
+            });
+        </script>
+
         <script type="text/javascript">applicationStartTime=Date.now();</script>
         <script src="dist/lib/deps.min.js"></script>
         <script src="dist/assets/js/main.min.js"></script>
